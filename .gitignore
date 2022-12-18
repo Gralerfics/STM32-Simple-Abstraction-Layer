@@ -1,3 +1,3 @@
 .idea/
-cmake-build-release-mingw_for_stm32/
-cmake-build-debug-mingw_for_stm32/
+cmake-build-release_mingw_stm32/
+cmake-build-debug_mingw_stm32/
