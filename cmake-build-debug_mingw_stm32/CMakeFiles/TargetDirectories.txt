@@ -1,0 +1,3 @@
+D:/MyFiles/Projects/STM32-Simple-Abstraction-Layer/cmake-build-debug_mingw_stm32/CMakeFiles/Template_For_F103VET6.elf.dir
+D:/MyFiles/Projects/STM32-Simple-Abstraction-Layer/cmake-build-debug_mingw_stm32/CMakeFiles/edit_cache.dir
+D:/MyFiles/Projects/STM32-Simple-Abstraction-Layer/cmake-build-debug_mingw_stm32/CMakeFiles/rebuild_cache.dir
