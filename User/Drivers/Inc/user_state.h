@@ -12,12 +12,12 @@ extern "C" {
 #include "common.h"
 
 typedef enum {
-	USER_STATE_OK = 0,
-	USER_STATE_FAIL,
-	USER_STATE_IDLE,
-	USER_STATE_BUSY,
-	USER_STATE_COMPLETE,
-	USER_STATE_RESERVE
+	OK = 0,
+	FAIL,
+	IDLE,
+	BUSY,
+	COMPLETE,
+	RESERVE
 } UserState;
 
 #ifdef __cplusplus

@@ -16,7 +16,8 @@ extern "C" {
 
 class UserRCC {
 public:
-	static void EnableGPIOClock(GPIO_TypeDef *_port);
+	static UserState EnableGPIOClock(GPIO_TypeDef *_port);
+	static UserState EnableTIMClock(TIM_TypeDef *_tim);
 };
 
 #ifdef __cplusplus

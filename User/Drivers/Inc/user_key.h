@@ -16,11 +16,12 @@ extern "C" {
 class UserKey {
 private:
 	UserGPIO io;
-	bool activeHigh = false;
+	bool activeHigh;
 
 public:
-	UserKey(const UserGPIO &_io);
-	UserKey(const UserGPIO &_io, bool _activeHigh);
+	UserKey(const UserGPIO &_io, bool _activeHigh = false);
+
+	UserState init();
 
 	UserGPIO& getPin();
 	bool isActiveHigh();

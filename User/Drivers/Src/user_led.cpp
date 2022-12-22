@@ -4,15 +4,17 @@
 
 #include "user_led.h"
 
-UserLED::UserLED(const UserGPIO &_io) {
+UserLED::UserLED(const UserGPIO &_io, bool _activeHigh) {
 	this -> io = _io;
-	this -> io.setMode(GPIO_Mode_Out_PP);
-	this -> off();
+	this -> activeHigh = _activeHigh;
+	this -> init();
 }
 
-UserLED::UserLED(const UserGPIO &_io, bool _activeHigh): UserLED(_io) {
-	this -> activeHigh = _activeHigh;
+UserState UserLED::init() {
+	this -> io.setMode(GPIO_Mode_Out_PP);
+	this -> io.init();
 	this -> off();
+	return UserState::OK;
 }
 
 UserGPIO &UserLED::getPin() {
@@ -32,7 +34,7 @@ UserState UserLED::off() {
 }
 
 UserState UserLED::toggle() {
-	return this -> io.setState((BitAction) !((bool) this -> io.getState()));
+	return this -> io.toggleState();
 }
 
 UserState UserLED::setState(bool _state) {

@@ -13,17 +13,19 @@ extern "C" {
 
 #include "user_state.h"
 
+#define USER_GPIO_PORT_DEFAULT GPIOA
+#define USER_GPIO_PIN_DEFAULT GPIO_Pin_0
+#define USER_GPIO_MODE_DEFAULT GPIO_Mode_Out_PP
+#define USER_GPIO_SPEED_DEFAULT GPIO_Speed_50MHz
+
 class UserGPIO {
 private:
 	GPIO_InitTypeDef params{};
 	GPIO_TypeDef *port;
 
 public:
-	UserGPIO();
-	UserGPIO(GPIO_TypeDef *_port, uint32_t _pin);
-	UserGPIO(GPIO_TypeDef *_port, uint32_t _pin, GPIOMode_TypeDef _mode);
-	UserGPIO(GPIO_TypeDef *_port, uint32_t _pin, GPIOMode_TypeDef _mode, GPIOSpeed_TypeDef _speed);
-	explicit UserGPIO(const char *_label);
+	UserGPIO(GPIO_TypeDef *_port = USER_GPIO_PORT_DEFAULT, uint32_t _pin = USER_GPIO_PIN_DEFAULT, GPIOMode_TypeDef _mode = USER_GPIO_MODE_DEFAULT, GPIOSpeed_TypeDef _speed = USER_GPIO_SPEED_DEFAULT);
+	explicit UserGPIO(const char *_label, GPIOMode_TypeDef _mode = USER_GPIO_MODE_DEFAULT, GPIOSpeed_TypeDef _speed = USER_GPIO_SPEED_DEFAULT);
 
 	UserState init();
 
@@ -39,6 +41,7 @@ public:
 	UserState setHigh();
 	UserState setLow();
 	UserState setState(BitAction _state);
+	UserState toggleState();
 
 	BitAction getState();
 };

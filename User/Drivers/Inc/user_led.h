@@ -16,11 +16,12 @@ extern "C" {
 class UserLED {
 private:
 	UserGPIO io;
-	bool activeHigh = false;
+	bool activeHigh;
 
 public:
-	UserLED(const UserGPIO &_io);
-	UserLED(const UserGPIO &_io, bool _activeHigh);
+	UserLED(const UserGPIO &_io, bool _activeHigh = false);
+
+	UserState init();
 
 	UserGPIO& getPin();
 	bool isActiveHigh();

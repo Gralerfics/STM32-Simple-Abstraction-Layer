@@ -6,18 +6,20 @@
 
 #include "user_delayer.h"
 
-UserKey::UserKey(const UserGPIO &_io) {
+UserKey::UserKey(const UserGPIO &_io, bool _activeHigh) {
 	this -> io = _io;
-	this -> io.setMode(GPIO_Mode_IPU);
+	this -> activeHigh = _activeHigh;
+	this -> init();
 }
 
-UserKey::UserKey(const UserGPIO &_io, bool _activeHigh): UserKey(_io) {
-	this -> activeHigh = _activeHigh;
-	if (_activeHigh) {
+UserState UserKey::init() {
+	if (this -> activeHigh) {
 		this -> io.setMode(GPIO_Mode_IPD);
 	} else {
 		this -> io.setMode(GPIO_Mode_IPU);
 	}
+	this -> io.init();
+	return UserState::OK;
 }
 
 UserGPIO &UserKey::getPin() {

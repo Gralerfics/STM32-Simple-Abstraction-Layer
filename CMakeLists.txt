@@ -50,6 +50,7 @@ include_directories(
         Drivers/CMSIS/Include
         User
         User/Drivers/Inc
+        User/Utils
 )
 
 add_definitions(-DUSE_HAL_DRIVER -DSTM32F103xE)

@@ -8,49 +8,20 @@
 
 #include "user_rcc.h"
 
-#define PORT_DEFAULT GPIOA
-#define PIN_DEFAULT GPIO_Pin_0
-#define MODE_DEFAULT GPIO_Mode_Out_PP
-#define SPEED_DEFAULT GPIO_Speed_50MHz
-
 #define IS_GPIO_INPUT_MODE(MODE) ((MODE & 0x10) == 0)
 
-UserGPIO::UserGPIO() {
-	this -> port = PORT_DEFAULT;
-	this -> params.GPIO_Pin = PIN_DEFAULT;
-	this -> params.GPIO_Mode = MODE_DEFAULT;
-	this -> params.GPIO_Speed = SPEED_DEFAULT;
-	this -> init();
-}
-
-UserGPIO::UserGPIO(GPIO_TypeDef *_port, uint32_t _pin) {
-	this -> port = IS_GPIO_ALL_PERIPH(_port) ? _port : PORT_DEFAULT;
-	this -> params.GPIO_Pin = IS_GPIO_PIN(_pin) ? _pin : PIN_DEFAULT;
-	this -> params.GPIO_Mode = MODE_DEFAULT;
-	this -> params.GPIO_Speed = SPEED_DEFAULT;
-	this -> init();
-}
-
-UserGPIO::UserGPIO(GPIO_TypeDef *_port, uint32_t _pin, GPIOMode_TypeDef _mode) {
-	this -> port = IS_GPIO_ALL_PERIPH(_port) ? _port : PORT_DEFAULT;
-	this -> params.GPIO_Pin = IS_GPIO_PIN(_pin) ? _pin : PIN_DEFAULT;
-	this -> params.GPIO_Mode = IS_GPIO_MODE(_mode) ? _mode : MODE_DEFAULT;
-	this -> params.GPIO_Speed = SPEED_DEFAULT;
-	this -> init();
-}
-
 UserGPIO::UserGPIO(GPIO_TypeDef *_port, uint32_t _pin, GPIOMode_TypeDef _mode, GPIOSpeed_TypeDef _speed) {
-	this -> port = IS_GPIO_ALL_PERIPH(_port) ? _port : PORT_DEFAULT;
-	this -> params.GPIO_Pin = IS_GPIO_PIN(_pin) ? _pin : PIN_DEFAULT;
-	this -> params.GPIO_Mode = IS_GPIO_MODE(_mode) ? _mode : MODE_DEFAULT;
-	this -> params.GPIO_Speed = IS_GPIO_SPEED(_speed) ? _speed : SPEED_DEFAULT;
+	this -> port = IS_GPIO_ALL_PERIPH(_port) ? _port : USER_GPIO_PORT_DEFAULT;
+	this -> params.GPIO_Pin = IS_GPIO_PIN(_pin) ? _pin : USER_GPIO_PIN_DEFAULT;
+	this -> params.GPIO_Mode = IS_GPIO_MODE(_mode) ? _mode : USER_GPIO_MODE_DEFAULT;
+	this -> params.GPIO_Speed = IS_GPIO_SPEED(_speed) ? _speed : USER_GPIO_SPEED_DEFAULT;
 	this -> init();
 }
 
-UserGPIO::UserGPIO(const char *_label) {
+UserGPIO::UserGPIO(const char *_label, GPIOMode_TypeDef _mode, GPIOSpeed_TypeDef _speed) {
 	if (strlen(_label) < 2 || strlen(_label) > 3) return;
 
-	GPIO_TypeDef *_port = (GPIO_TypeDef *) (APB2PERIPH_BASE + 0x0800 + (_label[0] - 'A') * 0x0400);
+	auto *_port = (GPIO_TypeDef *) (APB2PERIPH_BASE + 0x0800 + (_label[0] - 'A') * 0x0400);
 	if (!IS_GPIO_ALL_PERIPH(_port)) return;
 
 	uint32_t _pin = 0x1;
@@ -63,15 +34,15 @@ UserGPIO::UserGPIO(const char *_label) {
 
 	this -> port = _port;
 	this -> params.GPIO_Pin = _pin;
-	this -> params.GPIO_Mode = MODE_DEFAULT;
-	this -> params.GPIO_Speed = SPEED_DEFAULT;
+	this -> params.GPIO_Mode = IS_GPIO_MODE(_mode) ? _mode : USER_GPIO_MODE_DEFAULT;
+	this -> params.GPIO_Speed = IS_GPIO_SPEED(_speed) ? _speed : USER_GPIO_SPEED_DEFAULT;
 	this -> init();
 }
 
 UserState UserGPIO::init() {
 	UserRCC::EnableGPIOClock(this -> port);
 	GPIO_Init(this -> port, &this -> params);
-	return USER_STATE_OK;
+	return OK;
 }
 
 GPIO_TypeDef *UserGPIO::getPort() const {
@@ -91,49 +62,53 @@ GPIOSpeed_TypeDef UserGPIO::getSpeed() const {
 }
 
 UserState UserGPIO::setPin(GPIO_TypeDef *_port, uint32_t _pin) {
-	if (!IS_GPIO_ALL_PERIPH(_port) || !IS_GPIO_PIN(_pin)) return USER_STATE_FAIL;
+	if (!IS_GPIO_ALL_PERIPH(_port) || !IS_GPIO_PIN(_pin)) return FAIL;
 
 	this -> port = _port;
 	this -> params.GPIO_Pin = _pin;
-	GPIO_Init(this -> port, &this -> params);
-	return USER_STATE_OK;
+	this -> init();
+	return OK;
 }
 
 UserState UserGPIO::setMode(GPIOMode_TypeDef _mode) {
-	if (!IS_GPIO_MODE(_mode)) return USER_STATE_FAIL;
+	if (!IS_GPIO_MODE(_mode)) return FAIL;
 
 	this -> params.GPIO_Mode = _mode;
-	GPIO_Init(this -> port, &this -> params);
-	return USER_STATE_OK;
+	this -> init();
+	return OK;
 }
 
 UserState UserGPIO::setSpeed(GPIOSpeed_TypeDef _speed) {
-	if (!IS_GPIO_SPEED(_speed)) return USER_STATE_FAIL;
+	if (!IS_GPIO_SPEED(_speed)) return FAIL;
 
 	this -> params.GPIO_Speed = _speed;
-	GPIO_Init(this -> port, &this -> params);
-	return USER_STATE_OK;
+	this -> init();
+	return OK;
 }
 
 UserState UserGPIO::setHigh() {
-	if (IS_GPIO_INPUT_MODE(this -> params.GPIO_Mode)) return USER_STATE_FAIL;
+	if (IS_GPIO_INPUT_MODE(this -> params.GPIO_Mode)) return FAIL;
 
 	GPIO_SetBits(this -> port, this -> params.GPIO_Pin);
-	return USER_STATE_OK;
+	return OK;
 }
 
 UserState UserGPIO::setLow() {
-	if (IS_GPIO_INPUT_MODE(this -> params.GPIO_Mode)) return USER_STATE_FAIL;
+	if (IS_GPIO_INPUT_MODE(this -> params.GPIO_Mode)) return FAIL;
 
 	GPIO_ResetBits(this -> port, this -> params.GPIO_Pin);
-	return USER_STATE_OK;
+	return OK;
 }
 
 UserState UserGPIO::setState(BitAction _state) {
-	if (IS_GPIO_INPUT_MODE(this -> params.GPIO_Mode) || !IS_GPIO_BIT_ACTION(_state)) return USER_STATE_FAIL;
+	if (IS_GPIO_INPUT_MODE(this -> params.GPIO_Mode) || !IS_GPIO_BIT_ACTION(_state)) return FAIL;
 
 	GPIO_WriteBit(this -> port, this -> params.GPIO_Pin, _state);
-	return USER_STATE_OK;
+	return OK;
+}
+
+UserState UserGPIO::toggleState() {
+	return this -> setState((BitAction) !((bool) this -> getState()));
 }
 
 BitAction UserGPIO::getState() {

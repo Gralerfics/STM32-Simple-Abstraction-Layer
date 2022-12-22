@@ -1,49 +1,47 @@
 #include "main.h"
 
-#include "user_gpio.h"
-#include "user_tim.h"
+#include "usart.h"
+
 #include "user_led.h"
-#include "user_key.h"
-#include "user_delayer.h"
+#include "user_general_tim.h"
 
-#include "stm32f10x_it.h"
+#define OUTPUT_FREQ 100
+#define WINDOW_WIDTH 200
 
-UserLED led(UserGPIO("B0"));
-UserKey key(UserGPIO("C13"), true);
+UserGPIO io_out("A4");
+UserGPIO io_in("D2", GPIO_Mode_IN_FLOATING);
 
-void Example_LED_Alternating() {
-	while (true) {
-		led.toggle();
-		Delayer::ms(500);
-	}
+UserBasicTIM tim6(TIM6, OUTPUT_FREQ * 2, "Hz");
+UserGeneralTIM tim2(TIM2, WINDOW_WIDTH, "ms");
+UserGeneralTIM tim3(TIM3, 0, 0xFFFE);
+
+int cnt = 0;
+
+void toggleOut() {
+	io_out.toggleState();
 }
 
-void Example_Controlled_LED() {
-	bool active = false, active_last = false;
-	while (true) {
-		active_last = active;
-		active = key.isActive(20);
-
-		if (!active_last && active) {
-			led.toggle();
-		}
-
-		Delayer::ms(1);
-	}
-}
-
-void Example_Timer() {
-	UserTIM tim(TIM2, 72000 - 1, 10000 - 1);
-	while (true) {}
-}
-
-void TIM2_IRQHandler(void) {
-	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) {
-		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-		led.toggle();
-	}
+void sampleCounter() {
+	cnt = tim3.getCounter();
+	TIM_SetCounter(TIM3,0);
 }
 
 void Main() {
-	Example_Timer();
+	tim6.registerHandler(&toggleOut);
+	tim6.initInterrupt();
+	tim6.start();
+
+	tim2.registerHandler(&sampleCounter);
+	tim2.initInterrupt();
+	tim2.start();
+
+	tim3.setClockSource(UserTIMClockSource::External_2);
+	tim3.start();
+
+	USART_Config();
+	while (true) {
+		char txt[50] = {0};
+		sprintf(txt, "Current Frequency: %.2lf Hz.\n", cnt * 1000.0 / WINDOW_WIDTH);
+		Usart_SendString(DEBUG_USARTx, txt);
+	}
 }
