@@ -11,7 +11,7 @@ extern "C" {
 
 #include "common.h"
 
-#include "user_state.h"
+#include "user_typedef.h"
 
 #include "user_basic_tim.h"
 
@@ -30,9 +30,9 @@ protected:
 
 public:
 	UserGeneralTIM(TIM_TypeDef *_tim, uint16_t _psc, uint16_t _per);
-	UserGeneralTIM(TIM_TypeDef *_tim, uint32_t _val, char *_unit);
+	UserGeneralTIM(TIM_TypeDef *_tim, uint32_t _val, UserTimeUnit _unit);
 
-	UserState registerHandler(UserTIMCallbackTypeDef ptr) override;
+	UserState registerHandler(UserCallbackFunc ptr) override;
 
 	UserState setClockSource(UserTIMClockSource _clk_src, uint16_t etr_trgprescaler = USER_TIM_ETR_TRGPRESCALER_DEFAULT, uint16_t etr_trgpolarity = USER_TIM_ETR_TRGPOLARITY_DEFAULT, uint16_t etr_trgfilter = USER_TIM_ETR_TRGFILTER_DEFAULT);
 };

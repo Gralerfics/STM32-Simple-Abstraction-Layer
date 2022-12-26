@@ -8,11 +8,11 @@
 #define OUTPUT_FREQ 100
 #define WINDOW_WIDTH 200
 
-UserGPIO io_out("A4");
-UserGPIO io_in("D2", GPIO_Mode_IN_FLOATING);
+UserGPIO io_out(UserPin::PA4);
+UserGPIO io_in(UserPin::PD2, GPIO_Mode_IN_FLOATING);
 
-UserBasicTIM tim6(TIM6, OUTPUT_FREQ * 2, "Hz");
-UserGeneralTIM tim2(TIM2, WINDOW_WIDTH, "ms");
+UserBasicTIM tim6(TIM6, OUTPUT_FREQ * 2, UserTimeUnit::Hz);
+UserGeneralTIM tim2(TIM2, WINDOW_WIDTH, UserTimeUnit::ms);
 UserGeneralTIM tim3(TIM3, 0, 0xFFFE);
 
 int cnt = 0;
@@ -27,12 +27,10 @@ void sampleCounter() {
 }
 
 void Main() {
-	tim6.registerHandler(&toggleOut);
-	tim6.initInterrupt();
+	tim6.enableInterrupt(&toggleOut);
 	tim6.start();
 
-	tim2.registerHandler(&sampleCounter);
-	tim2.initInterrupt();
+	tim2.enableInterrupt(&sampleCounter);
 	tim2.start();
 
 	tim3.setClockSource(UserTIMClockSource::External_2);

@@ -16,8 +16,8 @@
 #define COUNTERMODE_DEFAULT TIM_CounterMode_Up
 #define REPETITIONCOUNTER_DEFAULT 0
 
-static UserTIMCallbackTypeDef tim6_irqHandler = nullptr;
-static UserTIMCallbackTypeDef tim7_irqHandler = nullptr;
+static UserCallbackFunc tim6_irqHandler = nullptr;
+static UserCallbackFunc tim7_irqHandler = nullptr;
 
 UserBasicTIM::UserBasicTIM(TIM_TypeDef *_tim, uint16_t _psc, uint16_t _per) {
 	this -> tim = _tim;
@@ -29,20 +29,29 @@ UserBasicTIM::UserBasicTIM(TIM_TypeDef *_tim, uint16_t _psc, uint16_t _per) {
 	this -> initTimeBase();
 }
 
-UserBasicTIM::UserBasicTIM(TIM_TypeDef *_tim, uint32_t _val, char *_unit) {
+UserBasicTIM::UserBasicTIM(TIM_TypeDef *_tim, uint32_t _val, UserTimeUnit _unit) {
 	double target_freq;
-	if (strlen(_unit) == 1 && _unit[0] == 's') {
-		target_freq = 1.0 / _val;
-	} else if (strlen(_unit) == 2 && _unit[0] == 'm' && _unit[1] == 's') {
-		target_freq = 1000.0 / _val;
-	} else if (strlen(_unit) == 2 && _unit[0] == 'u' && _unit[1] == 's') {
-		target_freq = 1000000.0 / _val;
-	} else if (strlen(_unit) == 2 && _unit[0] == 'H' && _unit[1] == 'z') {
-		target_freq = _val;
-	} else if (strlen(_unit) == 3 && _unit[0] == 'k' && _unit[1] == 'H' && _unit[2] == 'z') {
-		target_freq = 1000.0 * _val;
-	} else {
-		target_freq = 1000.0;
+	switch (_unit) {
+		case UserTimeUnit::s:
+			target_freq = 1.0 / _val;
+			break;
+		case UserTimeUnit::ms:
+			target_freq = 1000.0 / _val;
+			break;
+		case UserTimeUnit::us:
+			target_freq = 1000000.0 / _val;
+			break;
+		case UserTimeUnit::Hz:
+			target_freq = _val;
+			break;
+		case UserTimeUnit::kHz:
+			target_freq = 1000.0 * _val;
+			break;
+		case UserTimeUnit::MHz:
+			target_freq = 1000000.0 / _val;
+			break;
+		default:
+			target_freq = 1000.0;
 	}
 
 	uint32_t psc = 0, per = 0;
@@ -85,14 +94,20 @@ UserState UserBasicTIM::initTimeBase() {
 	return UserState::OK;
 }
 
-UserState UserBasicTIM::initInterrupt() {
+UserState UserBasicTIM::enableInterrupt() {
 	TIM_ITConfig(this -> tim, TIM_IT_Update, ENABLE);
 	UserNVIC::EnableTIMInterrupt(this -> tim);
 	TIM_ClearFlag(this -> tim, TIM_FLAG_Update);
 	return UserState::OK;
 }
 
-UserState UserBasicTIM::registerHandler(UserTIMCallbackTypeDef ptr) {
+UserState UserBasicTIM::enableInterrupt(UserCallbackFunc callbackFuncPtr) {
+	this -> registerHandler(callbackFuncPtr);
+	this -> enableInterrupt();
+	return UserState::OK;
+}
+
+UserState UserBasicTIM::registerHandler(UserCallbackFunc ptr) {
 	if (this -> tim == TIM6) {
 		tim6_irqHandler = ptr;
 	} else if (this -> tim == TIM7) {

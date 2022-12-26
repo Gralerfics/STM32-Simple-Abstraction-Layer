@@ -2,8 +2,8 @@
 // Created by Gralerfics on 2022/12/18.
 //
 
-#ifndef _USER_STATE_H_
-#define _USER_STATE_H_
+#ifndef _USER_TYPEDEF_H_
+#define _USER_TYPEDEF_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,6 +19,12 @@ typedef enum {
 	COMPLETE,
 	RESERVE
 } UserState;
+
+typedef enum {
+	s, ms, us, Hz, kHz, MHz
+} UserTimeUnit;
+
+typedef void (*UserCallbackFunc)();
 
 #ifdef __cplusplus
 }

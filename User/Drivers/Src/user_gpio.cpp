@@ -18,18 +18,11 @@ UserGPIO::UserGPIO(GPIO_TypeDef *_port, uint32_t _pin, GPIOMode_TypeDef _mode, G
 	this -> init();
 }
 
-UserGPIO::UserGPIO(const char *_label, GPIOMode_TypeDef _mode, GPIOSpeed_TypeDef _speed) {
-	if (strlen(_label) < 2 || strlen(_label) > 3) return;
-
-	auto *_port = (GPIO_TypeDef *) (APB2PERIPH_BASE + 0x0800 + (_label[0] - 'A') * 0x0400);
+UserGPIO::UserGPIO(UserPin _label, GPIOMode_TypeDef _mode, GPIOSpeed_TypeDef _speed) {
+	auto *_port = (GPIO_TypeDef *) (APB2PERIPH_BASE + 0x0800 + (_label / 100) * 0x0400);
 	if (!IS_GPIO_ALL_PERIPH(_port)) return;
 
-	uint32_t _pin = 0x1;
-	if (strlen(_label) == 2) {
-		_pin = _pin << (_label[1] - '0');
-	} else if (strlen(_label) == 3) {
-		_pin = _pin << ((_label[1] - '0') * 10 + (_label[2] - '0'));
-	}
+	uint32_t _pin = 0x1 << (_label % 100);
 	if (!IS_GPIO_PIN(_pin)) return;
 
 	this -> port = _port;

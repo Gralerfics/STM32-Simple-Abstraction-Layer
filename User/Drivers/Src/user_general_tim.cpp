@@ -4,20 +4,20 @@
 
 #include "user_general_tim.h"
 
-static UserTIMCallbackTypeDef tim2_irqHandler = nullptr;
-static UserTIMCallbackTypeDef tim3_irqHandler = nullptr;
-static UserTIMCallbackTypeDef tim4_irqHandler = nullptr;
-static UserTIMCallbackTypeDef tim5_irqHandler = nullptr;
+static UserCallbackFunc tim2_irqHandler = nullptr;
+static UserCallbackFunc tim3_irqHandler = nullptr;
+static UserCallbackFunc tim4_irqHandler = nullptr;
+static UserCallbackFunc tim5_irqHandler = nullptr;
 
 UserGeneralTIM::UserGeneralTIM(TIM_TypeDef *_tim, uint16_t _psc, uint16_t _per) : UserBasicTIM(_tim, _psc, _per) {
 	this -> clk_src = UserTIMClockSource::Internal;
 }
 
-UserGeneralTIM::UserGeneralTIM(TIM_TypeDef *_tim, uint32_t _val, char *_unit) : UserBasicTIM(_tim, _val, _unit) {
+UserGeneralTIM::UserGeneralTIM(TIM_TypeDef *_tim, uint32_t _val, UserTimeUnit _unit) : UserBasicTIM(_tim, _val, _unit) {
 	this -> clk_src = UserTIMClockSource::Internal;
 }
 
-UserState UserGeneralTIM::registerHandler(UserTIMCallbackTypeDef ptr) {
+UserState UserGeneralTIM::registerHandler(UserCallbackFunc ptr) {
 	if (this -> tim == TIM2) {
 		tim2_irqHandler = ptr;
 	} else if (this -> tim == TIM3) {

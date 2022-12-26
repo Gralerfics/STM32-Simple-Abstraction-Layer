@@ -77,11 +77,11 @@ void sampleCounter() {
 
 void Main() {
     tim6.registerHandler(&toggleOut);
-    tim6.initInterrupt();
+    tim6.enableInterrupt();
     tim6.start();
     
     tim2.registerHandler(&sampleCounter);
-    tim2.initInterrupt();
+    tim2.enableInterrupt();
     tim2.start();
     
     tim3.setClockSource(UserTIMClockSource::External_2);

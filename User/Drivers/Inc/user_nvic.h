@@ -11,7 +11,7 @@ extern "C" {
 
 #include "common.h"
 
-#include "user_state.h"
+#include "user_typedef.h"
 
 class UserNVIC {
 public:

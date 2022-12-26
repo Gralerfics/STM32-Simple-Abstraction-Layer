@@ -11,9 +11,7 @@ extern "C" {
 
 #include "common.h"
 
-#include "user_state.h"
-
-typedef void (*UserTIMCallbackTypeDef)();
+#include "user_typedef.h"
 
 class UserBasicTIM {
 protected:
@@ -22,10 +20,11 @@ protected:
 
 public:
 	UserBasicTIM(TIM_TypeDef *_tim, uint16_t _psc, uint16_t _per);
-	UserBasicTIM(TIM_TypeDef *_tim, uint32_t _val, char *_unit);
+	UserBasicTIM(TIM_TypeDef *_tim, uint32_t _val, UserTimeUnit _unit);
 
-	UserState initInterrupt();
-	virtual UserState registerHandler(UserTIMCallbackTypeDef ptr);
+	UserState enableInterrupt();
+	UserState enableInterrupt(UserCallbackFunc callbackFuncPtr);
+	virtual UserState registerHandler(UserCallbackFunc ptr);
 
 	UserState start();
 	UserState stop();
