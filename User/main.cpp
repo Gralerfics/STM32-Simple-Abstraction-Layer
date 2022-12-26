@@ -8,8 +8,8 @@
 #define OUTPUT_FREQ 100
 #define WINDOW_WIDTH 200
 
-UserGPIO io_out(UserPin::PA4);
-UserGPIO io_in(UserPin::PD2, GPIO_Mode_IN_FLOATING);
+UserGPIO io_out(UserGPIOs::PA4);
+UserGPIO io_in(UserGPIOs::PD2, GPIO_Mode_IN_FLOATING);
 
 UserBasicTIM tim6(TIM6, OUTPUT_FREQ * 2, UserTimeUnit::Hz);
 UserGeneralTIM tim2(TIM2, WINDOW_WIDTH, UserTimeUnit::ms);
@@ -23,7 +23,7 @@ void toggleOut() {
 
 void sampleCounter() {
 	cnt = tim3.getCounter();
-	TIM_SetCounter(TIM3,0);
+	tim3.setCounter(0);
 }
 
 void Main() {

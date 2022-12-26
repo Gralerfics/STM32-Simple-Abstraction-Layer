@@ -18,7 +18,7 @@ UserGPIO::UserGPIO(GPIO_TypeDef *_port, uint32_t _pin, GPIOMode_TypeDef _mode, G
 	this -> init();
 }
 
-UserGPIO::UserGPIO(UserPin _label, GPIOMode_TypeDef _mode, GPIOSpeed_TypeDef _speed) {
+UserGPIO::UserGPIO(UserGPIOs _label, GPIOMode_TypeDef _mode, GPIOSpeed_TypeDef _speed) {
 	auto *_port = (GPIO_TypeDef *) (APB2PERIPH_BASE + 0x0800 + (_label / 100) * 0x0400);
 	if (!IS_GPIO_ALL_PERIPH(_port)) return;
 
